@@ -1,0 +1,81 @@
+package com.gitansh.gatekeeper.api_management_service.controller;
+
+
+import com.gitansh.gatekeeper.api_management_service.dto.requestDto.OrganizationRequest;
+import com.gitansh.gatekeeper.api_management_service.dto.requestDto.OrganizationStatusRequest;
+import com.gitansh.gatekeeper.api_management_service.dto.requestDto.TenantAdminRequest;
+import com.gitansh.gatekeeper.api_management_service.dto.responseDto.OrganizationResponse;
+import com.gitansh.gatekeeper.api_management_service.dto.responseDto.TenantAdminResponse;
+import com.gitansh.gatekeeper.api_management_service.service.OrganizationService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/platform/organizations")
+public class PlateformOrganisationController {
+    private OrganizationService organizationService;
+    PlateformOrganisationController(OrganizationService organizationService){
+        this.organizationService = organizationService;
+    }
+    @PostMapping
+    public ResponseEntity<OrganizationResponse> create(@Valid  @RequestBody OrganizationRequest organizationRequest){
+           return ResponseEntity.status(HttpStatus.CREATED)
+                   .body(organizationService.create(organizationRequest));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<OrganizationResponse>> findAll(){
+        return ResponseEntity.ok(organizationService.findAll());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<OrganizationResponse> findById(@PathVariable Long id){
+        return ResponseEntity.ok(organizationService.findById(id));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<OrganizationResponse> update (@PathVariable Long id , @Valid @RequestBody OrganizationRequest organizationRequest ){
+            return ResponseEntity.ok(organizationService.update(id , organizationRequest));
+    }
+
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<OrganizationResponse> changeStatus(@PathVariable Long id , @Valid @RequestBody OrganizationStatusRequest organizationStatusRequest ){
+        return ResponseEntity.ok(organizationService.changeStatus(id , organizationStatusRequest));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id){
+        organizationService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+    // CRUD --> Tenant Admins
+    @PostMapping("/{organizationId}/tenant-admin")
+    public ResponseEntity<TenantAdminResponse> createTenantAdmin(@PathVariable Long organizationId,
+                                                                 @Valid @RequestBody TenantAdminRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(organizationService.createTenantAdmin(organizationId, request));
+    }
+
+    @GetMapping("/{organizationId}/tenant-admin")
+    public ResponseEntity<TenantAdminResponse> getTenantAdmin(@PathVariable Long organizationId) {
+        return ResponseEntity.ok(organizationService.getTenantAdmin(organizationId));
+    }
+
+    @PutMapping("/{organizationId}/tenant-admin")
+    public ResponseEntity<TenantAdminResponse> updateTenantAdmin(@PathVariable Long organizationId,
+                                                                 @Valid @RequestBody TenantAdminRequest request) {
+        return ResponseEntity.ok(organizationService.updateTenantAdmin(organizationId, request));
+    }
+
+    @DeleteMapping("/{organizationId}/tenant-admin")
+    public ResponseEntity<Void> deleteTenantAdmin(@PathVariable Long organizationId) {
+        organizationService.deleteTenantAdmin(organizationId);
+        return ResponseEntity.noContent().build();
+    }
+
+
+}
